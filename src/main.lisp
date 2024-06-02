@@ -1,16 +1,7 @@
 (defpackage gendo-bot
   (:use :cl)
-  (:import-from #:cl-telegram-bot
-                #:start-processing
-                #:on-message
-                #:on-command
-                #:defbot)
-  (:import-from #:cl-telegram-bot/chat
-                #:private-chat
-                #:get-username)
-  (:import-from #:cl-telegram-bot/message
-                #:reply
-                #:get-current-chat)
+  (:local-nicknames (:ctb :cl-telegram-bot)
+                    (:ctb/message :cl-telegram-bot/message))
   (:export #:main))
 
 (in-package :gendo-bot)
@@ -59,7 +50,7 @@
 (unless (clsql:table-exists-p 'users)
   (create-users-table))
 
-(cl-telegram-bot:defbot gendo-bot)
+(ctb:defbot gendo-bot)
 
 (setf *gendo-bot*
       ;; Dear Unknown,
@@ -72,11 +63,11 @@
                         (error "Define GENDO_TOKEN env var."))))
         (make-gendo-bot token)))
 
-(defmethod cl-telegram-bot:on-message
+(defmethod ctb:on-message
     ((bot gendo-bot) text)
   ;; collect data from the last message
-  (let* ((raw-data (cl-telegram-bot/message:get-raw-data
-                    cl-telegram-bot/message::*current-message*))
+  (let* ((raw-data (ctb/message:get-raw-data
+                    ctb/message::*current-message*))
          (message-id (getf raw-data ':|message_id|))
          (text (getf raw-data ':|text|))
          (text (string-trim "\"" text))
@@ -97,23 +88,23 @@
        :attributes attributes
        :values values))))
 
-(defmethod cl-telegram-bot:on-command
+(defmethod ctb:on-command
     ((bot gendo-bot)
      (command (eql :help)) text)
   (declare (ignorable text))
-  (cl-telegram-bot:reply "Just send me any text and I'll reply with the same text."))
+  (ctb:reply "Just send me any text and I'll reply with the same text."))
 
-(defmethod cl-telegram-bot:on-command
+(defmethod ctb:on-command
     ((bot gendo-bot)
      (command (eql :start)) text)
   (declare (ignorable text))
-  (cl-telegram-bot:reply "Welcome Lisper! Have a fun, playing with cl-telegram-bot!"))
+  (ctb:reply "Welcome Lisper! Have a fun, playing with cl-telegram-bot!"))
 
-(defmethod cl-telegram-bot:on-command
+(defmethod ctb:on-command
     ((bot gendo-bot)
      (command (eql :register)) text)
-  (let* ((raw-data (cl-telegram-bot/message:get-raw-data
-                    cl-telegram-bot/message::*current-message*))
+  (let* ((raw-data (ctb/message:get-raw-data
+                    ctb/message::*current-message*))
          (date (getf raw-data ':|date|))
          (from (getf raw-data ':|from|))
          (from-id (getf from ':|id|))
@@ -129,7 +120,7 @@
        :attributes attributes
        :values values)))
   (declare (ignorable text))
-  (cl-telegram-bot:reply "Your user data are now stored in the DB."))
+  (ctb:reply "Your user data are now stored in the DB."))
 
 (defun main ()
-  (cl-telegram-bot:start-processing *gendo-bot*))
+  (ctb:start-processing *gendo-bot*))
