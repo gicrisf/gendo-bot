@@ -1,10 +1,10 @@
-(defpackage listener-bot/tests/main
+(defpackage gendo-bot/tests/main
   (:use :cl
-        :listener-bot
+        :gendo-bot
         :rove))
-(in-package :listener-bot/tests/main)
+(in-package :gendo-bot/tests/main)
 
-;; NOTE: To run this test file, execute `(asdf:test-system :listener-bot)' in your Lisp.
+;; NOTE: To run this test file, execute `(asdf:test-system :gendo-bot)' in your Lisp.
 
 (deftest test-target-1
   (testing "should (= 1 1) to be true"
